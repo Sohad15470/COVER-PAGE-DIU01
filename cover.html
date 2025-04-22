@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DIU Cover Page Generator</title>
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #333333;
+            --container-bg: #ffffff;
+            --input-bg: #ffffff;
+            --border-color: #dddddd;
+            transition: all 0.3s ease;
+        }
+
+        .night-mode {
+            --bg-color: #1a1a1a;
+            --text-color: #e0e0e0;
+            --container-bg: #2d2d2d;
+            --input-bg: #404040;
+            --border-color: #555555;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: var(--container-bg);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        h1, h2, h3 {
+            color: var(--text-color);
+        }
+
+        .form-section {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: var(--input-bg);
+            border-radius: 5px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 16px;
+            background-color: var(--input-bg);
+            color: var(--text-color);
+        }
+
+        button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .night-mode-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        #experiment-number-container {
+            display: none;
+            margin-bottom: 15px;
+        }
+
+        .preview-container {
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            min-height: 400px;
+            background: var(--container-bg);
+        }
+
+        .template-options {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .template-btn {
+            padding: 8px 15px;
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .template-btn.active {
+            background: #3498db;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <button id="night-mode-toggle" class="night-mode-toggle">🌙 Night Mode</button>
+    
+    <div class="container">
+        <h1>DIU Cover Page Generator</h1>
+        
+        <div class="form-section">
+            <h2>Create Your Cover Page</h2>
+            
+            <div id="experiment-number-container">
+                <label for="experiment-number">Experiment Number</label>
+                <input type="number" id="experiment-number" min="1" value="1">
+            </div>
+
+            <select id="document-type">
+                <option value="assignment">Assignment</option>
+                <option value="lab-report">Lab Report</option>
+            </select>
+
+            <h3>Course Information</h3>
+            <input type="text" id="course-code" placeholder="Course Code">
+            <input type="text" id="course-title" placeholder="Course Title">
+            <input type="text" id="topic" placeholder="Topic">
+
+            <h3>Teacher Information</h3>
+            <input type="text" id="teacher-name" placeholder="Teacher's Name">
+            <input type="text" id="designation" placeholder="Designation">
+            <input type="text" id="department" placeholder="Department">
+
+            <h3>Student Information</h3>
+            <input type="text" id="student-name" placeholder="Student Name">
+            <input type="text" id="student-id" placeholder="Student ID">
+            <input type="text" id="section" placeholder="Section">
+            <input type="text" id="student-dept" placeholder="Department">
+            <input type="date" id="submission-date">
+
+            <div class="actions">
+                <button id="generate-btn">Generate Cover Page</button>
+                <button id="clear-btn">Clear Form</button>
+            </div>
+        </div>
+
+        <div class="preview-section">
+            <h2>Preview</h2>
+            <div class="template-options">
+                <div class="template-btn active" data-template="classic">Classic</div>
+                <div class="template-btn" data-template="modern">Modern</div>
+                <div class="template-btn" data-template="elegant">Elegant</div>
+            </div>
+            <div class="preview-container" id="preview">
+                <!-- Preview content will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Night Mode Toggle
+        let isNightMode = localStorage.getItem('nightMode') === 'true';
+        const toggleNightMode = () => {
+            isNightMode = !isNightMode;
+            document.body.classList.toggle('night-mode', isNightMode);
+            localStorage.setItem('nightMode', isNightMode);
+            document.getElementById('night-mode-toggle').textContent = 
+                isNightMode ? '☀️ Light Mode' : '🌙 Night Mode';
+        };
+        document.getElementById('night-mode-toggle').addEventListener('click', toggleNightMode);
+        document.body.classList.toggle('night-mode', isNightMode);
+        document.getElementById('night-mode-toggle').textContent = 
+            isNightMode ? '☀️ Light Mode' : '🌙 Night Mode';
+
+        // Experiment Number Visibility
+        const docTypeSelect = document.getElementById('document-type');
+        const experimentContainer = document.getElementById('experiment-number-container');
+        docTypeSelect.addEventListener('change', () => {
+            experimentContainer.style.display = 
+                docTypeSelect.value === 'lab-report' ? 'block' : 'none';
+        });
+
+        // Generate Cover Page
+        document.getElementById('generate-btn').addEventListener('click', () => {
+            const docType = document.getElementById('document-type').value;
+            const experimentNumber = document.getElementById('experiment-number').value;
+            const courseCode = document.getElementById('course-code').value;
+            const courseTitle = document.getElementById('course-title').value;
+            const topic = document.getElementById('topic').value;
+            const teacherName = document.getElementById('teacher-name').value;
+            const designation = document.getElementById('designation').value;
+            const department = document.getElementById('department').value;
+            const studentName = document.getElementById('student-name').value;
+            const studentId = document.getElementById('student-id').value;
+            const section = document.getElementById('section').value;
+            const studentDept = document.getElementById('student-dept').value;
+            const submissionDate = document.getElementById('submission-date').value;
+
+            let html = `
+                <h1>${docType === 'lab-report' ? 'LAB REPORT' : 'ASSIGNMENT'}</h1>
+                ${docType === 'lab-report' ? `<h3>EXPERIMENT NO: ${experimentNumber}</h3>` : ''}
+                <h2>Course Information</h2>
+                <p>Course Code: ${courseCode}</p>
+                <p>Course Title: ${courseTitle}</p>
+                <p>Topic: ${topic}</p>
+                <h2>Submitted To</h2>
+                <p>${teacherName}<br>${designation}<br>${department}</p>
+                <h2>Submitted By</h2>
+                <p>${studentName}<br>ID: ${studentId}<br>Section: ${section}<br>Department: ${studentDept}</p>
+                <p>Submission Date: ${new Date(submissionDate).toLocaleDateString()}</p>
+            `;
+
+            document.getElementById('preview').innerHTML = html;
+        });
+
+        // Clear Form
+        document.getElementById('clear-btn').addEventListener('click', () => {
+            document.querySelectorAll('input').forEach(input => input.value = '');
+            document.getElementById('preview').innerHTML = '';
+        });
+    </script>
+</body>
+</html>
